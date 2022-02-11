@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/myrachanto/microservice/order/src/controllers"
+	m "github.com/myrachanto/microservice/order/src/middlewares"
 	"github.com/myrachanto/microservice/order/src/repository"
 	service "github.com/myrachanto/microservice/order/src/services"
 
@@ -58,14 +59,13 @@ func StoreApi() {
 		SigningMethod: "HS256",
 		SigningKey:    []byte(open.Key),
 	}))
-	front := e.Group("/front")
-	front.POST("/create", controllers.OrderController.Create)
-	front.POST("/item", controllers.OrderController.Additem)
-	front.GET("/order/:id", controllers.OrderController.GetOne)
-	front.GET("/order", controllers.OrderController.GetAll)
-	JWTgroup.PUT("order/:id", controllers.OrderController.Update)
-	JWTgroup.PUT("order/item/:id", controllers.OrderController.Updateitem)
-	JWTgroup.DELETE("oder/:id", controllers.OrderController.Delete)
+	e.POST("/create", controllers.OrderController.Create, m.Tokenizing)
+	e.POST("/item", controllers.OrderController.Additem, m.Tokenizing)
+	e.GET("/order/:id", controllers.OrderController.GetOne, m.Tokenizing)
+	e.GET("/order", controllers.OrderController.GetAll, m.Tokenizing)
+	JWTgroup.PUT("order/:id", controllers.OrderController.Update, m.Tokenizing)
+	JWTgroup.PUT("order/item/:id", controllers.OrderController.Updateitem, m.Tokenizing)
+	JWTgroup.DELETE("oder/:id", controllers.OrderController.Delete, m.Tokenizing)
 	//e.DELETE("loggoutall/:id", controllers.orderController.DeleteALL) logout all accounts
 
 	// Start server

@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"encoding/json"
 	"strconv"
 
+	fetcher "github.com/myrachanto/Fetcher"
 	httperors "github.com/myrachanto/custom-http-error"
 	"github.com/myrachanto/microservice/order/src/model"
 )
@@ -16,7 +18,13 @@ type Key struct {
 	EncryptionKey string `mapstructure:"EncryptionKey"`
 }
 
-type orderrepo struct{}
+type orderrepo struct {
+	Token string
+}
+
+func Tokenin(token string) *orderrepo {
+	return &orderrepo{Token: token}
+}
 
 type OrderRepoInterface interface {
 	Create(order *model.Order) (string, httperors.HttpErr)
@@ -54,10 +62,19 @@ func (orderRepo orderrepo) Create(order *model.Order) (string, httperors.HttpErr
 	IndexRepo.DbClose(GormDB)
 	return "order created successifully", nil
 }
-func (orderRepo orderrepo) Additem(item *model.Item) (string, httperors.HttpErr) {
+func (o orderrepo) Additem(item *model.Item) (string, httperors.HttpErr) {
 	if err := item.Validate(); err != nil {
 		return "", err
 	}
+	//fetch data from product microservice
+	fetch := &fetcher.Fetcher{Endpoint: "http://product_backend:4001", Token: o.Token}
+	response, err := fetch.Request("GET", "/products/"+item.Prodductcode, nil)
+	if err != nil {
+		return "", httperors.NewNotFoundError("could not get the data on that product")
+	}
+	product := &model.Product{}
+	json.NewDecoder(response.Body).Decode(product)
+	item.Name = product.Name
 	GormDB, err1 := IndexRepo.Getconnected()
 	if err1 != nil {
 		return "", err1

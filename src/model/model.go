@@ -30,6 +30,20 @@ type Item struct {
 	gorm.Model
 }
 
+//other micorservice structs
+type Product struct {
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	BuyPrice    float64 `json:"buy_price"`
+	SellPrice   float64 `json:"sell_price"`
+	Quantity    int64   `json:"quantity"`
+	Picture     string  `json:"picture"`
+	Available   bool    `json:"available"`
+	Usercode    string  `json:"usercode"`
+	Productcode string  `json:"code"`
+	gorm.Model
+}
+
 //Validate ..
 func (order Order) Validate() httperors.HttpErr {
 	if order.Customer == "" {

@@ -18,6 +18,7 @@ var (
 
 type orderController struct {
 	service service.OrderServiceInterface
+	Token   string
 }
 type OrdercontrollerInterface interface {
 	Create(c echo.Context) error
@@ -31,7 +32,7 @@ type OrdercontrollerInterface interface {
 
 func NeworderController(ser service.OrderServiceInterface) OrdercontrollerInterface {
 	return &orderController{
-		ser,
+		service: ser,
 	}
 }
 
@@ -54,6 +55,7 @@ func (controller orderController) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, s)
 }
 func (controller orderController) Additem(c echo.Context) error {
+	service.Tokenin(c.Get("Authorization").(string))
 	item := &model.Item{}
 	item.Name = c.FormValue("name")
 	item.Prodductcode = c.FormValue("productcode")

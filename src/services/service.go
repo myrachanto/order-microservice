@@ -25,15 +25,20 @@ type OrderServiceInterface interface {
 
 type orderService struct {
 	repository r.OrderRepoInterface
+	Token      string
+}
+
+func Tokenin(token string) *orderService {
+	return &orderService{Token: token}
 }
 
 func NeworderService(repo r.OrderRepoInterface) OrderServiceInterface {
 	return &orderService{
-		repo,
+		repository: repo,
 	}
 }
 
-func (service orderService) Create(order *model.Order) (string, httperors.HttpErr) {
+func (service *orderService) Create(order *model.Order) (string, httperors.HttpErr) {
 	if err := order.Validate(); err != nil {
 		return "", err
 	}
@@ -44,10 +49,11 @@ func (service orderService) Create(order *model.Order) (string, httperors.HttpEr
 	return s, nil
 
 }
-func (service orderService) Additem(item *model.Item) (string, httperors.HttpErr) {
+func (service *orderService) Additem(item *model.Item) (string, httperors.HttpErr) {
 	if err := item.Validate(); err != nil {
 		return "", err
 	}
+	r.Tokenin(service.Token)
 	s, err1 := r.Orderrepo.Additem(item)
 	if err1 != nil {
 		return "", err1
@@ -55,7 +61,7 @@ func (service orderService) Additem(item *model.Item) (string, httperors.HttpErr
 	return s, nil
 
 }
-func (service orderService) GetOne(code int) (*model.Order, httperors.HttpErr) {
+func (service *orderService) GetOne(code int) (*model.Order, httperors.HttpErr) {
 	order, err1 := r.Orderrepo.GetOne(code)
 	if err1 != nil {
 		return nil, err1
@@ -63,17 +69,17 @@ func (service orderService) GetOne(code int) (*model.Order, httperors.HttpErr) {
 	return order, nil
 }
 
-func (service orderService) GetAll(search string, page, pagesize int) ([]model.Order, httperors.HttpErr) {
+func (service *orderService) GetAll(search string, page, pagesize int) ([]model.Order, httperors.HttpErr) {
 	results, err := r.Orderrepo.GetAll(search, page, pagesize)
 	return results, err
 }
 
-// func (service orderService) UpdateRole(code, admin, supervisor, employee, level, ordercode string) (string, *httperors.HttpError) {
+// func (service *orderService)  UpdateRole(code, admin, supervisor, employee, level, ordercode string) (string, *httperors.HttpError) {
 // 	order, err1 := r.Orderrepo.UpdateRole(code, admin, supervisor, employee, level, ordercode)
 // 	return order, err1
 // }
 
-func (service orderService) Update(id int, order *model.Order) (*model.Order, httperors.HttpErr) {
+func (service *orderService) Update(id int, order *model.Order) (*model.Order, httperors.HttpErr) {
 	fmt.Println("update1-controller")
 	fmt.Println(id)
 	order, err1 := r.Orderrepo.Update(id, order)
@@ -83,7 +89,7 @@ func (service orderService) Update(id int, order *model.Order) (*model.Order, ht
 
 	return order, nil
 }
-func (service orderService) Updateitem(id int, item *model.Item) (*model.Item, httperors.HttpErr) {
+func (service *orderService) Updateitem(id int, item *model.Item) (*model.Item, httperors.HttpErr) {
 	fmt.Println("update1-controller")
 	fmt.Println(id)
 	item, err1 := r.Orderrepo.Updateitem(id, item)
@@ -93,7 +99,7 @@ func (service orderService) Updateitem(id int, item *model.Item) (*model.Item, h
 
 	return item, nil
 }
-func (service orderService) Delete(id int) (string, httperors.HttpErr) {
+func (service *orderService) Delete(id int) (string, httperors.HttpErr) {
 	success, failure := r.Orderrepo.Delete(id)
 	return success, failure
 }
