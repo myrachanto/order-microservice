@@ -52,7 +52,7 @@ func (order Order) Validate() httperors.HttpErr {
 	if order.Address == "" {
 		return httperors.NewNotFoundError("Invalid Address")
 	}
-	if order.Amount == 0 {
+	if order.Amount <= 0 {
 		return httperors.NewNotFoundError("Invalid Amount")
 	}
 	return nil
@@ -61,10 +61,10 @@ func (item Item) Validate() httperors.HttpErr {
 	if item.Name == "" {
 		return httperors.NewNotFoundError("Invalid  Name")
 	}
-	if item.Price == 0 {
+	if item.Price <= 0 {
 		return httperors.NewNotFoundError("Invalid Price")
 	}
-	if item.Quantity == 0 {
+	if item.Quantity <= 0 {
 		return httperors.NewNotFoundError("Invalid Quantity")
 	}
 	return nil
