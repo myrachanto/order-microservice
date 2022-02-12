@@ -6,6 +6,7 @@ import (
 
 	fetcher "github.com/myrachanto/Fetcher"
 	httperors "github.com/myrachanto/custom-http-error"
+	pubsub "github.com/myrachanto/microservice/order/src/events"
 	"github.com/myrachanto/microservice/order/src/model"
 )
 
@@ -60,6 +61,8 @@ func (orderRepo orderrepo) Create(order *model.Order) (string, httperors.HttpErr
 	order.Ordercode = code
 	GormDB.Create(&order)
 	IndexRepo.DbClose(GormDB)
+	//pub sub the information about the order creation being filed up
+	pubsub.Produce("order_topic", "Order_created", order)
 	return "order created successifully", nil
 }
 func (o orderrepo) Additem(item *model.Item) (string, httperors.HttpErr) {
@@ -80,6 +83,7 @@ func (o orderrepo) Additem(item *model.Item) (string, httperors.HttpErr) {
 		return "", err1
 	}
 	GormDB.Create(&item)
+	//pub sub the information about the order creation
 	IndexRepo.DbClose(GormDB)
 	return "order created successifully", nil
 }

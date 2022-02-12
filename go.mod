@@ -3,6 +3,7 @@ module github.com/myrachanto/microservice/order
 go 1.16
 
 require (
+	github.com/confluentinc/confluent-kafka-go v1.8.2 // indirect
 	github.com/labstack/echo/v4 v4.6.3
 	github.com/myrachanto/Fetcher v0.0.0-20220211061944-2bb8322608f6
 	github.com/myrachanto/custom-http-error v0.0.0-20211202111939-98671440b8fa
